@@ -26,7 +26,7 @@ const unzipper = require('unzipper'),
 
   const unzip = (pathIn, pathOut) => { 
     try{
-        fs.createReadStream('myfile.zip')
+        fs.createReadStream("myfile.zip")
        .pipe(unzipper.Extract({ path: 'unzipped' }))
         console.log('Extraction Operation Complete');
     }catch (error){
@@ -41,13 +41,13 @@ const unzipper = require('unzipper'),
  * @return {promise}
  */
 
-/* const readDir = dir => {
-
-}; */
 
 
+
+
+/*
  
-const readDir=dir=>{
+const readDir=dir=>{                             // I tried the promise version of readDir, but this gave me the files from _MACOX, so I commented this out
   return new Promise ((resolve, reject)=>{
       fs.readdir('unzipped', "utf8", (err,files)=>{
       if (err){
@@ -65,8 +65,8 @@ readDir(filepath)
   .then(files=> console.log (files))
   .catch( err => console.log (err))
     
- /*   
-   const readDir = dir => {                     // I tried the callback version of the readDir funciton
+ */   
+   const readDir = (dir) => {                     // I tried the callback version of the readDir funciton
    fs.readdir("unzipped", (err,files)=>{        
     if (err){
        return console.log(err);
@@ -74,18 +74,15 @@ readDir(filepath)
       let list=[];                              //create a list so the .png names can be pushed into this later
         files.forEach((file)=>{                //for each loop will loop through the file directory
             if(path.extname(file)===".png"){   //this will only print out the file with .png end. 
-              list.push(file);                 //this will push the .png to a list 
-               console.log(list)               //this will print out the list with files 
-               return list
-            }         
-        })
-      
-})
-   }
-   
-   
-readDir()
-*/
+              list.push(file);                 //this will push the .png to a list   
+            }    
+        });
+       console.log (list);  
+            return list;
+}); 
+   };
+
+readDir();
 
 /**
  * Description: Read in png file by given pathIn, 
@@ -97,7 +94,7 @@ readDir()
  */
 
 //const grayScale = (pathIn, pathOut) => {}//
-/*
+
 const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to parse the pathIn image
   fs.createReadStream("./unzipped/in.png")                      //need to use the readstream because need to move the photo files in pieces, this fs.readstream will read the whole file into buffer. Stream can process data as soon as it arrives
   .pipe(                                            //to avoid backpressure, pipe is used. It can  temporarily pause readstream when readstream speed is faster than creatstream
@@ -121,34 +118,9 @@ const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to
     this.pack().pipe(fs.createWriteStream("./grayscaled/out.png")); // after turning images into grayscale, need to pass out the images via creatstream function. the destinatin of the file should be under the "grayscaled directory"
   });
 
-}; */
-const grayScale = (pathIn, pathOut) => { 
-fs.createReadStream("./unzipped/in.png")
-  .pipe(
-    new PNG({
-      filterType: 4,
-    })
-  )
-  .on("parsed", function () {
-    for (var y = 0; y < this.height; y++) {
-      for (var x = 0; x < this.width; x++) {
-        var idx = (this.width * y + x) << 2;
- 
-        // invert color
-        this.data[idx] = 255 - this.data[idx];
-        this.data[idx + 1] = 255 - this.data[idx + 1];
-        this.data[idx + 2] = 255 - this.data[idx + 2];
- 
-        // and reduce opacity
-        this.data[idx + 3] = this.data[idx + 3] >> 1;
-      }
-    }
- 
-    this.pack().pipe(fs.createWriteStream("./grayscaled/out.png"));
-  });}
-grayScale()
+}; 
 
-module.exports = {                         //will export the function into other files 
+module.exports = {                         
   unzip,
   readDir,
   grayScale

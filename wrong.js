@@ -37,7 +37,7 @@ const unzipper = require('unzipper'),
   const unzip = (pathIn, pathOut) => { 
     try{
         fs.createReadStream('myfile.zip')
-       .pipe(unzipper.Extract({ path: 'unzipped' }))
+       .pipe(unzipper.Extract({ path: pathIn }))
         console.log('Extraction Operation Complete');
     }catch (error){
     console.log(error);
@@ -86,7 +86,7 @@ const unzipper = require('unzipper'),
  */
 //const grayScale = (pathIn, pathOut) => {//
 const grayScale = (pathIn, pathOut) => {  
-  fs.createReadStream("unzipped")
+  fs.createReadStream(pathIn)
   .pipe(
     new PNG({
       filterType: 4,
@@ -106,7 +106,7 @@ const grayScale = (pathIn, pathOut) => {
       }
     }
  
-    this.pack().pipe(fs.createWriteStream("out.png"));
+    this.pack().pipe(fs.createWriteStream(pathOut));
   });
 
 };
