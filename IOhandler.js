@@ -64,8 +64,8 @@ const filepath = (path.join(__dirname));
 readDir(filepath)
   .then(files=> console.log (files))
   .catch( err => console.log (err))
-         
-    /*
+    
+ /*   
    const readDir = dir => {                     // I tried the callback version of the readDir funciton
    fs.readdir("unzipped", (err,files)=>{        
     if (err){
@@ -97,9 +97,9 @@ readDir()
  */
 
 //const grayScale = (pathIn, pathOut) => {}//
-
+/*
 const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to parse the pathIn image
-  fs.createReadStream(readDir)                      //need to use the readstream because need to move the photo files in pieces, this fs.readstream will read the whole file into buffer. Stream can process data as soon as it arrives
+  fs.createReadStream("./unzipped/in.png")                      //need to use the readstream because need to move the photo files in pieces, this fs.readstream will read the whole file into buffer. Stream can process data as soon as it arrives
   .pipe(                                            //to avoid backpressure, pipe is used. It can  temporarily pause readstream when readstream speed is faster than creatstream
     new PNG({
       filterType: 4,                                //RGB belongs to filtertype 4
@@ -118,11 +118,35 @@ const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to
         }
         
   
-    this.pack().pipe(fs.createWriteStream("./grayscaled")); // after turning images into grayscale, need to pass out the images via creatstream function. the destinatin of the file should be under the "grayscaled directory"
+    this.pack().pipe(fs.createWriteStream("./grayscaled/out.png")); // after turning images into grayscale, need to pass out the images via creatstream function. the destinatin of the file should be under the "grayscaled directory"
   });
 
-};
-
+}; */
+const grayScale = (pathIn, pathOut) => { 
+fs.createReadStream("./unzipped/in.png")
+  .pipe(
+    new PNG({
+      filterType: 4,
+    })
+  )
+  .on("parsed", function () {
+    for (var y = 0; y < this.height; y++) {
+      for (var x = 0; x < this.width; x++) {
+        var idx = (this.width * y + x) << 2;
+ 
+        // invert color
+        this.data[idx] = 255 - this.data[idx];
+        this.data[idx + 1] = 255 - this.data[idx + 1];
+        this.data[idx + 2] = 255 - this.data[idx + 2];
+ 
+        // and reduce opacity
+        this.data[idx + 3] = this.data[idx + 3] >> 1;
+      }
+    }
+ 
+    this.pack().pipe(fs.createWriteStream("./grayscaled/out.png"));
+  });}
+grayScale()
 
 module.exports = {                         //will export the function into other files 
   unzip,
