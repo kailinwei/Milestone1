@@ -3,7 +3,7 @@
  * File Name: IOhandler.js
  * Description: Collection of functions for files input/output related operations
  * 
- * Created Date: Nov. 12th, 2020
+ * Created Date: Nov. 6th, 2020
  * Author: Kailin Wei
  * 
  */
@@ -24,72 +24,16 @@ const unzipper = require('unzipper'),
  * @return {promise}
  */
 
-  const unzip = (pathIn, pathOut) => {                    //wrapping unzip as in a promise, then  I can make the readDir and grayscaled function work in order
-    return new Promise  ((resolve, reject)=>{
-    fs.createReadStream(pathIn)                           //using createReadStream to allow the photo files being ready to process
-    .pipe(unzipper.Extract({ path:pathOut }))              //pipe is used to reduce backpressure. it hooks up streams together and pipe data into transform stream, and then to destination
-    .on("finish",()=>("Extraction Completed!"))            //.on allows the message to show only after the contraction has completed
-    resolve()
-    .on("error")
-    reject ()
-    })
+  const unzip = (pathIn, pathOut) => { 
+    try{
+        fs.createReadStream("myfile.zip")
+       .pipe(unzipper.Extract({ path:"uzipper" }))
+        console.log('Extraction Operation Complete');
+    }catch (error){
+    console.log(error);
   }
-
-
-  unzip(pathOut)
-      .then (readDir = (dir) => {                     
-        fs.readdir(dir, (err,files)=>{ 
-
-          if (err){return console.log(err);}
-
-          let list=[];                      
-                                              //create a list so the .png names can be pushed into this later
-          files.forEach((file)=>{  
-                                               //for each loop will loop through the file directory
-           if(path.extname(file)===".png"){   //this will only print out the file with .png end. 
-             list.push(file);                 //this will push the .png to a list   
-           }    
-       });
-      console.log (list);                     //this will print of the list
-           return list;                       //this will print the list in on array 
-}); 
   }
-  )
-
-      .then( grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to parse the pathIn image
-          fs.createReadStream(pathIn)                      //need to use the readstream because need to move the photo files in pieces, this fs.readstream will read the whole file into buffer. Stream can process data as soon as it arrives
-            .pipe(                                            //to avoid backpressure, pipe is used. It can  temporarily pause readstream when readstream speed is faster than creatstream
-             new PNG({
-                filterType: 4,                                //RGB belongs to filtertype 4
-              })
-              )
-          .on("parsed", function () {
- 
-        // inverting color
-
-        for (var i=0; i<=this.data.length;i+=4){        // this loop will go through the image and turn it into grayscaled
-          const avg=(this.data[i] + this.data[i+1] + this.data[i+2])/3 //this equation is based on the simple function for grayscale Gray=(R+G+B)/3
-          this.data[i]=avg                              //this.data is an important variable in this function, but I don't what does it represent 
-          this.data[i+1]=avg
-          this.data[i=2]=avg
-     
-        }
-    
-        this.pack().pipe(fs.createWriteStream(pathOut)); // after turning images into grayscale, need to pass out the images via creatstream function. the destinatin of the file should be under the "grayscaled directory"
-  });
-
-})
-      .then (res=> console.log (res))                    //this lines will be excute if the functions works perfectly
-      .catch (err=> console.log(err))                   //.catch will catch the error in a function 
-
-
-//const unzip = (pathIn, pathOut) => {
- // return new Promise ((resolve, reject)=>{
-
-  
- 
- 
-
+   unzip();
 /**
  * Description: read all the png files from given directory and return Promise containing array of each png file path 
  * 
@@ -98,7 +42,7 @@ const unzipper = require('unzipper'),
  */
 
 
-//const readDir=dir=>{   }//                    //I commented out the below session. For the below session, I tried to run the readDir() and grayscaled() individually to test if they work.
+
 
 
 /*
@@ -122,7 +66,6 @@ readDir(filepath)
   .catch( err => console.log (err))
     
  */   
-/*
    const readDir = (dir) => {                     // I tried the callback version of the readDir funciton
    fs.readdir("unzipped", (err,files)=>{        
     if (err){
@@ -139,9 +82,7 @@ readDir(filepath)
 }); 
    };
 
-readDir(dir); 
-
-*/
+readDir(dir);
 
 /**
  * Description: Read in png file by given pathIn, 
@@ -152,8 +93,8 @@ readDir(dir);
  * @return {promise}
  */
 
-const grayScale = (pathIn, pathOut) => {}
-/*
+//const grayScale = (pathIn, pathOut) => {}//
+
 const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to parse the pathIn image
   fs.createReadStream(pathIn)                      //need to use the readstream because need to move the photo files in pieces, this fs.readstream will read the whole file into buffer. Stream can process data as soon as it arrives
   .pipe(                                            //to avoid backpressure, pipe is used. It can  temporarily pause readstream when readstream speed is faster than creatstream
@@ -179,7 +120,7 @@ const grayScale = (pathIn, pathOut) => {            //I use the PNGJS library to
 
 }; 
 grayScale ('this/is/my/path.png', 'this/is/path/out.png')
-*/
+
 module.exports = {                         
   unzip,
   readDir,
